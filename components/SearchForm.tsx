@@ -1,0 +1,10 @@
+'use client';
+import { useRouter } from 'next/navigation';
+import { useState, FormEvent } from 'react';
+import { Search, MapPin, ChevronDown } from 'lucide-react';
+import { governorates } from '@/lib/config';
+export default function SearchForm({compact=false, initialType='',initialGovernorate='',initialQuery='',initialMax=''}:{compact?:boolean;initialType?:string;initialGovernorate?:string;initialQuery?:string;initialMax?:string}){
+ const router=useRouter();const [type,setType]=useState(initialType);const [gov,setGov]=useState(initialGovernorate);const [q,setQ]=useState(initialQuery);const [max,setMax]=useState(initialMax);
+ function submit(e:FormEvent){e.preventDefault();const s=new URLSearchParams();if(type)s.set('type',type);if(gov)s.set('governorate',gov);if(q.trim())s.set('q',q.trim());if(max&&Number(max)>0)s.set('max',max);router.push('/properties'+(s.toString()?'?'+s.toString():''));}
+ return <div className={'search-wrap '+(compact?'search-compact':'')}><div className="search-tabs"><button className={type==='rent'?'selected':''} type="button" onClick={()=>setType(type==='rent'?'':'rent')}>للإيجار</button><button className={type==='sale'?'selected':''} type="button" onClick={()=>setType(type==='sale'?'':'sale')}>للبيع</button><button className={!type?'selected':''} type="button" onClick={()=>setType('')}>الكل</button></div><form className="search-fields" onSubmit={submit}><label className="field search-where"><span>وين عم تدور؟</span><div><MapPin size={18}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="الحي أو اسم العقار"/></div></label><label className="field"><span>المحافظة</span><div><select value={gov} onChange={e=>setGov(e.target.value)}><option value="">كل المحافظات</option>{governorates.map(x=><option key={x} value={x}>{x}</option>)}</select><ChevronDown size={15}/></div></label><label className="field"><span>السعر الأقصى ($)</span><div><input type="number" min="1" value={max} onChange={e=>setMax(e.target.value)} placeholder="أي ميزانية"/></div></label><button className="btn btn-primary search-submit" type="submit"><Search size={20}/> ابحث الآن</button></form></div>;
+}
